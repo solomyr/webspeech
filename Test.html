@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Web Speech API Demo</title>
+  </head>
+  <body>
+    <h1>Web Speech API Demo</h1>
+    <p>Type some text and hit 'Speak' to hear it:</p>
+
+    <textarea id="text" rows="5" cols="30"></textarea><br>
+    <label for="voice">Voice:</label>
+    <select id="voice"></select><br>
+    <label for="rate">Rate:</label>
+    <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1"><br>
+    <label for="pitch">Pitch:</label>
+    <input type="range" id="pitch" min="0" max="2" step="0.1" value="1"><br>
+    <button id="speak">Speak</button>
+    <button id="stop">Stop</button>
+
+    <script>
+      var synth = window.speechSynthesis;
+
+      var text = document.getElementById('text');
+      var voiceSelect = document.getElementById('voice');
+      var rate = document.getElementById('rate');
+      var pitch = document.getElementById('pitch');
+      var speakButton = document.getElementById('speak');
+      var stopButton = document.getElementById('stop');
+
+      function populateVoiceList() {
+        var voices = synth.getVoices();
+        for(var i = 0; i < voices.length; i++) {
+          var option = document.createElement('option');
+          option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
+          option.value = i;
+          voiceSelect.appendChild(option);
+        }
+      }
+
+      populateVoiceList();
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = populateVoiceList;
+      }
+
+      speakButton.onclick = function() {
+        var utterThis = new SpeechSynthesisUtterance(text.value);
+        utterThis.voice = synth.getVoices()[voiceSelect.value];
+        utterThis.pitch = pitch.value;
+        utterThis.rate = rate.value;
+        synth.speak(utterThis);
+      }
+
+      stopButton.onclick = function() {
+        synth.cancel();
+      }
+    </script>
+  </body>
+</html>
